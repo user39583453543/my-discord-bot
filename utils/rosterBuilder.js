@@ -19,7 +19,7 @@ function buildRosterEmbed(data) {
         const prefix = m.emoji ? `${m.emoji} ` : "";
         return `${prefix}<@${m.userId}> - **${m.role.toUpperCase()}**`;
       })
-      .join("\n");
+      .join("\n\n");
   }
 
   const embed = new EmbedBuilder()
