@@ -1,0 +1,116 @@
+{
+  "roster": {
+    "title": "RISE",
+    "messageId": "1516916811302699099",
+    "channelId": "1516915258055331870",
+    "members": [
+      {
+        "userId": "720597923116613713",
+        "role": "Founder",
+        "emoji": "<:download1:1516917109945401534>"
+      },
+      {
+        "userId": "414514699414274048",
+        "role": "Support",
+        "emoji": "<:download1:1516917109945401534>"
+      },
+      {
+        "userId": "641394723822501907",
+        "role": "Support",
+        "emoji": "🇪🇦"
+      },
+      {
+        "userId": "921856021553627186",
+        "role": "core",
+        "emoji": "🇸🇦"
+      },
+      {
+        "userId": "911403419036696576",
+        "role": "Core",
+        "emoji": "🇫🇷"
+      },
+      {
+        "userId": "1042067313798676561",
+        "role": "core",
+        "emoji": "🇸🇪"
+      },
+      {
+        "userId": "271013195148165121",
+        "role": "core",
+        "emoji": "<:download1:1516917109945401534>"
+      },
+      {
+        "userId": "777242586548011008",
+        "role": "core",
+        "emoji": "🇩🇰"
+      },
+      {
+        "userId": "987514679263887370",
+        "role": "core",
+        "emoji": "🇩🇰"
+      },
+      {
+        "userId": "508340763369930754",
+        "role": "Core",
+        "emoji": "🇩🇰"
+      },
+      {
+        "userId": "685846692033200169",
+        "role": "core",
+        "emoji": "🇷🇴"
+      }
+    ]
+  },
+  "links": {
+    "discord": null,
+    "telegram": null,
+    "youtube": null
+  },
+  "tickets": {
+    "config": {
+      "staffRoleId": "1362098140328493255",
+      "logChannelId": "1362098141423472640",
+      "categoryId": "1368960935783563364",
+      "counter": 11,
+      "questions": [
+        {
+          "label": "Your name, age, game hours and average online",
+          "placeholder": "",
+          "paragraph": false
+        },
+        {
+          "label": "What role would you like to take in the clan?",
+          "placeholder": "",
+          "paragraph": false
+        },
+        {
+          "label": "What clans did you play in ?",
+          "placeholder": "",
+          "paragraph": false
+        },
+        {
+          "label": "Your PC, Steam link and Battlemetrics and how many hours you have",
+          "placeholder": "",
+          "paragraph": false
+        },
+        {
+          "label": "Can you buy vips?",
+          "placeholder": "",
+          "paragraph": false
+        }
+      ]
+    },
+    "active": {
+      "1517101624903077913": {
+        "ticketNumber": 7,
+        "userId": "959826775712600124",
+        "claimedBy": null,
+        "claimedByTag": null,
+        "openedAt": "2026-06-18T09:40:14.071Z",
+        "category": "General",
+        "openerTag": "fishvc",
+        "panelMsgId": "1517101627373523064"
+      }
+    }
+  }
+}
