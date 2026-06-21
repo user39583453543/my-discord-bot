@@ -371,32 +371,22 @@ async function handoverTicket(interaction) {
   const data = getGuildData(guild.id);
   const ticketInfo = data.tickets.active[channel.id];
   const cfg = data.tickets.config;
+  const target = interaction.options.getUser('user');
 
-  if (!ticketInfo) {
-    return interaction.reply({ content: '❌ This is not a ticket channel.', flags: MessageFlags.Ephemeral });
-  }
+  await interaction.deferReply();
 
   const member = await guild.members.fetch(interaction.user.id).catch(() => null);
   const isStaff = cfg.staffRoleId
     ? member && member.roles.cache.has(cfg.staffRoleId)
     : member && member.permissions.has('Administrator');
   if (!isStaff) {
-    return interaction.reply({ content: '❌ Only staff can hand over tickets.', flags: MessageFlags.Ephemeral });
-  }
-
-  const target = interaction.options.getUser('user');
-  if (target.id === ticketInfo.userId) {
-    return interaction.reply({ content: '❌ You cannot hand a ticket over to the person who opened it.', flags: MessageFlags.Ephemeral });
+    return interaction.editReply({ content: '❌ Only staff can hand over tickets.' });
   }
 
   const targetMember = await guild.members.fetch(target.id).catch(() => null);
   if (!targetMember) {
-    return interaction.reply({ content: '❌ Could not find that user in this server.', flags: MessageFlags.Ephemeral });
+    return interaction.editReply({ content: '❌ Could not find that user in this server.' });
   }
-
-  ticketInfo.claimedBy = target.id;
-  ticketInfo.claimedByTag = target.tag;
-  saveGuildData(guild.id, data);
 
   await channel.permissionOverwrites.edit(target.id, {
     ViewChannel: true,
@@ -405,18 +395,115 @@ async function handoverTicket(interaction) {
     AttachFiles: true,
   }).catch(() => {});
 
-  const embed = buildTicketEmbed(ticketInfo, guild.name);
-  const row = buildTicketButtons(true);
-  if (ticketInfo.panelMsgId) {
-    try {
-      const panelMsg = await channel.messages.fetch(ticketInfo.panelMsgId);
-      await panelMsg.edit({ embeds: [embed], components: [row] });
-    } catch {}
+  if (ticketInfo) {
+    ticketInfo.claimedBy = target.id;
+    ticketInfo.claimedByTag = target.tag;
+    saveGuildData(guild.id, data);
+    const embed = buildTicketEmbed(ticketInfo, guild.name);
+    const row = buildTicketButtons(true);
+    if (ticketInfo.panelMsgId) {
+      try {
+        const panelMsg = await channel.messages.fetch(ticketInfo.panelMsgId);
+        await panelMsg.edit({ embeds: [embed], components: [row] });
+      } catch {}
+    }
   }
 
-  return interaction.reply({
+  return interaction.editReply({
     content: `🔁 Ticket handed over to <@${target.id}> by <@${interaction.user.id}>.`,
   });
 }
 
-module.exports = { showTicketModal, handleModalSubmit, claimTicket, closeTicket, handleCloseModal, handoverTicket };
+async function setTicketPriority(interaction) {
+  const channel = interaction.channel;
+  const guild = interaction.guild;
+  const data = getGuildData(guild.id);
+  const ticketInfo = data.tickets.active[channel.id];
+  const cfg = data.tickets.config;
+
+  const level = interaction.options.getString('level');
+
+  await interaction.deferReply();
+
+  const member = await guild.members.fetch(interaction.user.id).catch(() => null);
+  const isStaff = cfg.staffRoleId
+    ? member && member.roles.cache.has(cfg.staffRoleId)
+    : member && member.permissions.has('Administrator');
+  if (!isStaff) {
+    return interaction.editReply({ content: '❌ Only staff can change ticket priority.' });
+  }
+
+  const numMatch = channel.name.match(/(\d+)$/);
+  const num = numMatch ? numMatch[1] : '0000';
+  const newName = level === 'high' ? `high-prio-${num}` : `low-prio-${num}`;
+  await channel.setName(newName).catch(() => {});
+
+  if (ticketInfo) {
+    ticketInfo.priority = level;
+    saveGuildData(guild.id, data);
+    const embed = buildTicketEmbed(ticketInfo, guild.name);
+    const row = buildTicketButtons(!!ticketInfo.claimedBy);
+    if (ticketInfo.panelMsgId) {
+      try {
+        const panelMsg = await channel.messages.fetch(ticketInfo.panelMsgId);
+        await panelMsg.edit({ embeds: [embed], components: [row] });
+      } catch {}
+    }
+  }
+
+  const label = level === 'high' ? '🔴 High Priority' : '🟡 Low Priority';
+  return interaction.editReply({ content: `✅ Ticket priority set to **${label}**.` });
+}
+
+async function adoptTicket(interaction) {
+  const channel = interaction.channel;
+  const guild = interaction.guild;
+  const data = getGuildData(guild.id);
+  const cfg = data.tickets.config;
+
+  const member = await guild.members.fetch(interaction.user.id).catch(() => null);
+  const isStaff = cfg.staffRoleId
+    ? member && member.roles.cache.has(cfg.staffRoleId)
+    : member && member.permissions.has('Administrator');
+  if (!isStaff) {
+    return interaction.reply({ content: '❌ Only staff can adopt tickets.', flags: MessageFlags.Ephemeral });
+  }
+
+  if (data.tickets.active[channel.id]) {
+    return interaction.reply({ content: '✅ This channel is already registered as an active ticket.', flags: MessageFlags.Ephemeral });
+  }
+
+  const opener = interaction.options.getUser('opener');
+
+  const numMatch = channel.name.match(/(\d+)$/);
+  const ticketNum = numMatch ? parseInt(numMatch[1], 10) : (cfg.counter || 0) + 1;
+
+  const priority = channel.name.startsWith('high') ? 'high' : 'low';
+
+  const ticketInfo = {
+    ticketNumber: ticketNum,
+    userId: opener.id,
+    openerTag: opener.tag,
+    claimedBy: null,
+    claimedByTag: null,
+    openedAt: new Date().toISOString(),
+    category: 'General',
+    priority,
+    answers: [],
+    panelMsgId: null,
+  };
+
+  data.tickets.active[channel.id] = ticketInfo;
+  saveGuildData(guild.id, data);
+
+  const embed = buildTicketEmbed(ticketInfo, guild.name);
+  const row = buildTicketButtons(false);
+  const panelMsg = await channel.send({ embeds: [embed], components: [row] });
+
+  data.tickets.active[channel.id].panelMsgId = panelMsg.id;
+  saveGuildData(guild.id, data);
+
+  return interaction.reply({ content: `✅ Ticket re-registered for <@${opener.id}>. Staff can now claim/close/handover it.`, flags: MessageFlags.Ephemeral });
+}
+
+module.exports = { showTicketModal, handleModalSubmit, claimTicket, closeTicket, handleCloseModal, handoverTicket, setTicketPriority, adoptTicket };
