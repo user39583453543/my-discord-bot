@@ -227,6 +227,13 @@ async function claimTicket(interaction) {
     return interaction.reply({ content: 'This is not a ticket channel.', flags: MessageFlags.Ephemeral });
   }
 
+  if (interaction.user.id === ticketInfo.userId) {
+    return interaction.reply({
+      content: '❌ You cannot claim your own ticket.',
+      flags: MessageFlags.Ephemeral,
+    });
+  }
+
   const member = await guild.members.fetch(interaction.user.id).catch(() => null);
   const isStaff = cfg.staffRoleId
     ? member && member.roles.cache.has(cfg.staffRoleId)
@@ -265,9 +272,17 @@ async function claimTicket(interaction) {
 async function closeTicket(interaction) {
   const channel = interaction.channel;
   const data = getGuildData(interaction.guild.id);
+  const ticketInfo = data.tickets.active[channel.id];
 
-  if (!data.tickets.active[channel.id]) {
+  if (!ticketInfo) {
     return interaction.reply({ content: 'This is not a ticket channel.', flags: MessageFlags.Ephemeral });
+  }
+
+  if (interaction.user.id === ticketInfo.userId) {
+    return interaction.reply({
+      content: '❌ You cannot close your own ticket.',
+      flags: MessageFlags.Ephemeral,
+    });
   }
 
   const modal = new ModalBuilder()
@@ -350,4 +365,58 @@ async function handleCloseModal(interaction) {
   setTimeout(async () => { try { await channel.delete(); } catch {} }, 3000);
 }
 
-module.exports = { showTicketModal, handleModalSubmit, claimTicket, closeTicket, handleCloseModal };
+async function handoverTicket(interaction) {
+  const channel = interaction.channel;
+  const guild = interaction.guild;
+  const data = getGuildData(guild.id);
+  const ticketInfo = data.tickets.active[channel.id];
+  const cfg = data.tickets.config;
+
+  if (!ticketInfo) {
+    return interaction.reply({ content: '❌ This is not a ticket channel.', flags: MessageFlags.Ephemeral });
+  }
+
+  const member = await guild.members.fetch(interaction.user.id).catch(() => null);
+  const isStaff = cfg.staffRoleId
+    ? member && member.roles.cache.has(cfg.staffRoleId)
+    : member && member.permissions.has('Administrator');
+  if (!isStaff) {
+    return interaction.reply({ content: '❌ Only staff can hand over tickets.', flags: MessageFlags.Ephemeral });
+  }
+
+  const target = interaction.options.getUser('user');
+  if (target.id === ticketInfo.userId) {
+    return interaction.reply({ content: '❌ You cannot hand a ticket over to the person who opened it.', flags: MessageFlags.Ephemeral });
+  }
+
+  const targetMember = await guild.members.fetch(target.id).catch(() => null);
+  if (!targetMember) {
+    return interaction.reply({ content: '❌ Could not find that user in this server.', flags: MessageFlags.Ephemeral });
+  }
+
+  ticketInfo.claimedBy = target.id;
+  ticketInfo.claimedByTag = target.tag;
+  saveGuildData(guild.id, data);
+
+  await channel.permissionOverwrites.edit(target.id, {
+    ViewChannel: true,
+    SendMessages: true,
+    ReadMessageHistory: true,
+    AttachFiles: true,
+  }).catch(() => {});
+
+  const embed = buildTicketEmbed(ticketInfo, guild.name);
+  const row = buildTicketButtons(true);
+  if (ticketInfo.panelMsgId) {
+    try {
+      const panelMsg = await channel.messages.fetch(ticketInfo.panelMsgId);
+      await panelMsg.edit({ embeds: [embed], components: [row] });
+    } catch {}
+  }
+
+  return interaction.reply({
+    content: `🔁 Ticket handed over to <@${target.id}> by <@${interaction.user.id}>.`,
+  });
+}
+
+module.exports = { showTicketModal, handleModalSubmit, claimTicket, closeTicket, handleCloseModal, handoverTicket };
