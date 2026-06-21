@@ -274,11 +274,7 @@ async function closeTicket(interaction) {
   const data = getGuildData(interaction.guild.id);
   const ticketInfo = data.tickets.active[channel.id];
 
-  if (!ticketInfo) {
-    return interaction.reply({ content: 'This is not a ticket channel.', flags: MessageFlags.Ephemeral });
-  }
-
-  if (interaction.user.id === ticketInfo.userId) {
+  if (ticketInfo && interaction.user.id === ticketInfo.userId) {
     return interaction.reply({
       content: '❌ You cannot close your own ticket.',
       flags: MessageFlags.Ephemeral,
@@ -305,62 +301,59 @@ async function handleCloseModal(interaction) {
   const guild = interaction.guild;
   const data = getGuildData(guild.id);
   const ticketInfo = data.tickets.active[channel.id];
-
-  if (!ticketInfo) {
-    return interaction.reply({ content: 'This is not a ticket channel.', flags: MessageFlags.Ephemeral });
-  }
-
   const reason = interaction.fields.getTextInputValue('close_reason');
 
   await interaction.reply({ content: '📋 Saving transcript and closing…', flags: MessageFlags.Ephemeral });
 
-  let transcriptFile;
-  try {
-    transcriptFile = await generateTranscript(channel, ticketInfo);
-  } catch (err) {
-    console.error('Transcript error:', err);
-  }
-
-  const cfg = data.tickets.config;
-  if (cfg.logChannelId) {
+  if (ticketInfo) {
+    let transcriptFile;
     try {
-      const logChannel = await guild.channels.fetch(cfg.logChannelId);
-      const logEmbed = new EmbedBuilder()
-        .setColor(GOLD)
-        .setTitle(`📋 Ticket #${ticketNumber(ticketInfo.ticketNumber)} Closed`)
+      transcriptFile = await generateTranscript(channel, ticketInfo);
+    } catch (err) {
+      console.error('Transcript error:', err);
+    }
+
+    const cfg = data.tickets.config;
+    if (cfg.logChannelId) {
+      try {
+        const logChannel = await guild.channels.fetch(cfg.logChannelId);
+        const logEmbed = new EmbedBuilder()
+          .setColor(GOLD)
+          .setTitle(`📋 Ticket #${ticketNumber(ticketInfo.ticketNumber)} Closed`)
+          .addFields(
+            { name: 'Opened By', value: `<@${ticketInfo.userId}>`, inline: true },
+            { name: 'Category', value: ticketInfo.category || 'General', inline: true },
+            { name: 'Closed By', value: `<@${interaction.user.id}>`, inline: true },
+            { name: 'Claimed By', value: ticketInfo.claimedBy ? `<@${ticketInfo.claimedBy}>` : 'Unclaimed', inline: true },
+            { name: 'Opened', value: `<t:${Math.floor(new Date(ticketInfo.openedAt).getTime() / 1000)}:F>`, inline: true },
+            { name: 'Close Reason', value: reason, inline: false },
+          )
+          .setTimestamp();
+        const sendOptions = { embeds: [logEmbed] };
+        if (transcriptFile) sendOptions.files = [transcriptFile];
+        await logChannel.send(sendOptions);
+      } catch (err) {
+        console.error('Failed to send to log channel:', err);
+      }
+    }
+
+    delete data.tickets.active[channel.id];
+    saveGuildData(guild.id, data);
+
+    try {
+      const member = await guild.members.fetch(ticketInfo.userId);
+      const dmEmbed = new EmbedBuilder()
+        .setColor(0xff4444)
+        .setTitle('🎫 Your ticket has been closed')
+        .setDescription(`Your ticket **#${ticketNumber(ticketInfo.ticketNumber)}** in **${guild.name}** has been closed.`)
         .addFields(
-          { name: 'Opened By', value: `<@${ticketInfo.userId}>`, inline: true },
-          { name: 'Category', value: ticketInfo.category || 'General', inline: true },
           { name: 'Closed By', value: `<@${interaction.user.id}>`, inline: true },
-          { name: 'Claimed By', value: ticketInfo.claimedBy ? `<@${ticketInfo.claimedBy}>` : 'Unclaimed', inline: true },
-          { name: 'Opened', value: `<t:${Math.floor(new Date(ticketInfo.openedAt).getTime() / 1000)}:F>`, inline: true },
-          { name: 'Close Reason', value: reason, inline: false },
+          { name: 'Reason', value: reason, inline: false },
         )
         .setTimestamp();
-      const sendOptions = { embeds: [logEmbed] };
-      if (transcriptFile) sendOptions.files = [transcriptFile];
-      await logChannel.send(sendOptions);
-    } catch (err) {
-      console.error('Failed to send to log channel:', err);
-    }
+      await member.send({ embeds: [dmEmbed] }).catch(() => {});
+    } catch {}
   }
-
-  delete data.tickets.active[channel.id];
-  saveGuildData(guild.id, data);
-
-  try {
-    const member = await guild.members.fetch(ticketInfo.userId);
-    const dmEmbed = new EmbedBuilder()
-      .setColor(0xff4444)
-      .setTitle('🎫 Your ticket has been closed')
-      .setDescription(`Your ticket **#${ticketNumber(ticketInfo.ticketNumber)}** in **${guild.name}** has been closed.`)
-      .addFields(
-        { name: 'Closed By', value: `<@${interaction.user.id}>`, inline: true },
-        { name: 'Reason', value: reason, inline: false },
-      )
-      .setTimestamp();
-    await member.send({ embeds: [dmEmbed] }).catch(() => {});
-  } catch {}
 
   setTimeout(async () => { try { await channel.delete(); } catch {} }, 3000);
 }
