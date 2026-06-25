@@ -1,0 +1,229 @@
+{
+  "roster": {
+    "title": "RiseTeam",
+    "messageId": "1518713783177187421",
+    "channelId": "1516915258055331870",
+    "members": [
+      {
+        "userId": "720597923116613713",
+        "role": "Founder",
+        "emoji": "<:download1:1516917109945401534>"
+      }
+    ]
+  },
+  "links": {
+    "discord": null,
+    "telegram": null,
+    "youtube": null
+  },
+  "tickets": {
+    "config": {
+      "staffRoleId": "1362098140328493255",
+      "logChannelId": "1362098141423472640",
+      "categoryId": "1368960935783563364",
+      "counter": 24,
+      "questions": [
+        {
+          "label": "Your name, age, game hours and average online",
+          "placeholder": "",
+          "paragraph": false
+        },
+        {
+          "label": "What role would you like to take in the clan?",
+          "placeholder": "",
+          "paragraph": false
+        },
+        {
+          "label": "What clans did you play in ?",
+          "placeholder": "",
+          "paragraph": false
+        },
+        {
+          "label": "Your PC, Steam link and Battlemetrics and how many hours you have",
+          "placeholder": "",
+          "paragraph": false
+        },
+        {
+          "label": "Can you buy vips?",
+          "placeholder": "",
+          "paragraph": false
+        }
+      ],
+      "declinedRoleId": "1518241176958795836",
+      "acceptRoleId": "1488111839987630163"
+    },
+    "active": {
+      "1517101624903077913": {
+        "ticketNumber": 7,
+        "userId": "959826775712600124",
+        "claimedBy": null,
+        "claimedByTag": null,
+        "openedAt": "2026-06-18T09:40:14.071Z",
+        "category": "General",
+        "openerTag": "fishvc",
+        "panelMsgId": "1517101627373523064"
+      },
+      "1517963267258056866": {
+        "ticketNumber": 28,
+        "userId": "736982533572395071",
+        "openerTag": "westronn9",
+        "claimedBy": "720597923116613713",
+        "claimedByTag": "zeiiken.",
+        "openedAt": "2026-06-21T10:29:24.787Z",
+        "category": "General",
+        "priority": "high",
+        "answers": [],
+        "panelMsgId": "1518201166683574363"
+      },
+      "1518239858689310892": {
+        "ticketNumber": 13,
+        "userId": "673874834320523285",
+        "openerTag": "rambizzz.",
+        "claimedBy": null,
+        "claimedByTag": null,
+        "openedAt": "2026-06-21T13:03:10.125Z",
+        "category": "General",
+        "priority": "low",
+        "answers": [
+          {
+            "question": "Your name, age, game hours and average online",
+            "answer": "Mirac, 17, 3k hours and average online is 4-5 hours"
+          },
+          {
+            "question": "What role would you like to take in the clan?",
+            "answer": "I'm PVP player so i want to be an monument guy"
+          },
+          {
+            "question": "What clans did you play in ?",
+            "answer": "8 deep groups and UP"
+          },
+          {
+            "question": "Your PC, Steam link and Battlemetrics and how many hours you have",
+            "answer": "My Specs are, 4070 Ti Super, R9 7950X3D 64 GB Ram, https://steamcommunity.com/profiles/76561198968051131/"
+          },
+          {
+            "question": "Can you buy vips?",
+            "answer": "Yes"
+          }
+        ],
+        "panelMsgId": "1518239860610175037"
+      },
+      "1518480784493903952": {
+        "ticketNumber": 15,
+        "userId": "492769011046547471",
+        "openerTag": "brclore",
+        "claimedBy": null,
+        "claimedByTag": null,
+        "openedAt": "2026-06-22T05:25:42.275Z",
+        "category": "General",
+        "priority": "low",
+        "answers": [],
+        "panelMsgId": "1518487123785678970"
+      },
+      "1518752119325196533": {
+        "ticketNumber": 14,
+        "userId": "1355995822378188970",
+        "openerTag": "glazingluno",
+        "claimedBy": null,
+        "claimedByTag": null,
+        "openedAt": "2026-06-22T22:58:42.455Z",
+        "category": "General",
+        "priority": "low",
+        "answers": [
+          {
+            "question": "Your name, age, game hours and average online",
+            "answer": "soka, 16, 4500, 10 hourss+ a day"
+          },
+          {
+            "question": "What role would you like to take in the clan?",
+            "answer": "farmbot, and a versatile player"
+          },
+          {
+            "question": "What clans did you play in ?",
+            "answer": "gt40, lean, baklava"
+          },
+          {
+            "question": "Your PC, Steam link and Battlemetrics and how many hours you have",
+            "answer": "AMD Radeon RX 7800 XT, ryzen 7700 x3d https://steamcommunity.com/profiles/76561199647472033/     https://www.battlemetrics.com/players/1186391474"
+          },
+          {
+            "question": "Can you buy vips?",
+            "answer": "yes"
+          }
+        ],
+        "panelMsgId": "1518752121078415370"
+      },
+      "1519004349571928210": {
+        "ticketNumber": 17,
+        "userId": "714037684741472296",
+        "openerTag": "tunnel12",
+        "claimedBy": null,
+        "claimedByTag": null,
+        "openedAt": "2026-06-23T15:40:58.848Z",
+        "category": "General",
+        "priority": "high",
+        "answers": [
+          {
+            "question": "Your name, age, game hours and average online",
+            "answer": "17 12h tunnel"
+          },
+          {
+            "question": "What role would you like to take in the clan?",
+            "answer": "anything"
+          },
+          {
+            "question": "What clans did you play in ?",
+            "answer": "up, huzzhouse and mostly just playing not as deep fg"
+          },
+          {
+            "question": "Your PC, Steam link and Battlemetrics and how many hours you have",
+            "answer": "9800x3d with 4060ti https://steamcommunity.com/profiles/76561198691376170/ im whitelisted on vital so dont think cause of my hrs are low same how it is with swiggle hes vouching me"
+          },
+          {
+            "question": "Can you buy vips?",
+            "answer": "yes"
+          }
+        ],
+        "panelMsgId": "1519004350901653738"
+      },
+      "1519089356734861435": {
+        "ticketNumber": 24,
+        "userId": "764235533589151775",
+        "openerTag": "4fc2",
+        "claimedBy": null,
+        "claimedByTag": null,
+        "openedAt": "2026-06-23T21:18:46.205Z",
+        "category": "General",
+        "priority": "low",
+        "answers": [
+          {
+            "question": "Your name, age, game hours and average online",
+            "answer": "everlasting 18 10hours"
+          },
+          {
+            "question": "What role would you like to take in the clan?",
+            "answer": "normal / pvp"
+          },
+          {
+            "question": "What clans did you play in ?",
+            "answer": "fsr and some other"
+          },
+          {
+            "question": "Your PC, Steam link and Battlemetrics and how many hours you have",
+            "answer": "9800x3d 5070 optimised by aide"
+          },
+          {
+            "question": "Can you buy vips?",
+            "answer": "ofc"
+          }
+        ],
+        "panelMsgId": "1519089359306096662"
+      }
+    }
+  },
+  "tracker": {
+    "tracked": [],
+    "playtimeServerId": "12747928",
+    "playtimeServerName": null
+  }
+}
