@@ -41,6 +41,7 @@ function defaultData() {
       wipe: { dayOfWeek: 4, hour: 17, tz: 'Europe/London' },
       wipeBoard: null,
     },
+    hoursBoard: null,
   };
 }
 
@@ -61,6 +62,9 @@ function getGuildData(guildId) {
   }
   if (data.tracker.wipeBoard === undefined) {
     data.tracker.wipeBoard = null;
+  }
+  if (data.hoursBoard === undefined) {
+    data.hoursBoard = null;
   }
   return data;
 }

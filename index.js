@@ -72,6 +72,94 @@ client.on('interactionCreate', async (interaction) => {
       if (interaction.customId === 'ticket_decline_modal') {
         return await handleDeclineModal(interaction);
       }
+      if (interaction.customId === 'track_setup_modal') {
+        const { getGuildData, saveGuildData } = require('./utils/storage');
+        const { updateHoursBoard } = require('./utils/hoursBoard');
+
+        const serverId = interaction.fields.getTextInputValue('bm_server_id').trim();
+        const channelId = interaction.fields.getTextInputValue('channel_id').trim();
+        const rawPlayers = interaction.fields.getTextInputValue('player_list');
+
+        // Validate server ID is numeric
+        if (!/^\d+$/.test(serverId)) {
+          return interaction.reply({
+            content: '❌ BattleMetrics Server ID must be a number (e.g. `12747928`).',
+            flags: MessageFlags.Ephemeral,
+          });
+        }
+
+        // Validate channel ID is numeric
+        if (!/^\d+$/.test(channelId)) {
+          return interaction.reply({
+            content: '❌ Discord Channel ID must be a number. Right-click a channel and choose "Copy ID".',
+            flags: MessageFlags.Ephemeral,
+          });
+        }
+
+        // Verify the channel exists in this guild
+        let targetChannel = interaction.guild.channels.cache.get(channelId);
+        if (!targetChannel) {
+          try {
+            targetChannel = await interaction.guild.channels.fetch(channelId);
+          } catch {
+            return interaction.reply({
+              content: `❌ Could not find a channel with ID \`${channelId}\` in this server.`,
+              flags: MessageFlags.Ephemeral,
+            });
+          }
+        }
+
+        // Parse player list: "steamid - name" one per line
+        const players = rawPlayers
+          .split(/\n+/)
+          .map((line) => line.trim())
+          .filter(Boolean)
+          .map((line) => {
+            // Support formats: "steamid - name", "steamid name", "steamid: name"
+            const match = line.match(/^(\d{17})\s*[-:]\s*(.+)$/) || line.match(/^(\d{17})\s+(.+)$/);
+            if (!match) return null;
+            const steamId = match[1];
+            const name = match[2].trim().slice(0, 50);
+            return { steamId, name };
+          })
+          .filter(Boolean)
+          .slice(0, 50);
+
+        if (!players.length) {
+          return interaction.reply({
+            content:
+              '❌ No valid players found. Use the format `76561198000000000 - PlayerName`, one per line.',
+            flags: MessageFlags.Ephemeral,
+          });
+        }
+
+        const data = getGuildData(interaction.guild.id);
+        const isUpdate = !!(data.hoursBoard && data.hoursBoard.serverId);
+
+        data.hoursBoard = {
+          serverId,
+          channelId,
+          players,
+          // Preserve existing messageId if the channel hasn't changed, so we edit in place
+          messageId:
+            isUpdate && data.hoursBoard.channelId === channelId
+              ? data.hoursBoard.messageId
+              : null,
+        };
+        saveGuildData(interaction.guild.id, data);
+
+        await interaction.reply({
+          content: `✅ Hours leaderboard ${isUpdate ? 'updated' : 'configured'}!\n📍 Channel: <#${channelId}>\n🎮 Server ID: \`${serverId}\`\n👥 Players: **${players.length}**\n\n⏳ The leaderboard will be posted/updated shortly (fetching playtime data now)…`,
+          flags: MessageFlags.Ephemeral,
+        });
+
+        // Trigger an immediate update so the embed appears right away
+        updateHoursBoard(interaction.client, interaction.guild.id).catch((err) =>
+          console.error('[HoursBoard] immediate update failed:', err?.message || err)
+        );
+
+        return;
+      }
       if (interaction.customId.startsWith('bm_bulktrack_modal:')) {
         const parts = interaction.customId.split(':');
         const channelId = parts[1];
