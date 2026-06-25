@@ -3,6 +3,7 @@ const { getPlayerCurrentServer } = require('./battlemetrics');
 const { getGuildData, saveGuildData } = require('./storage');
 const { getLastWipeBoundary } = require('./wipe');
 const { updateAllBoards } = require('./wipeBoard');
+const { updateAllHoursBoards } = require('./hoursBoard');
 const { GOLD } = require('../theme');
 
 let client = null;
@@ -13,6 +14,9 @@ function start(discordClient) {
   client = discordClient;
   setInterval(pollAll, POLL_INTERVAL);
   setInterval(() => updateAllBoards(client), BOARD_INTERVAL);
+  setInterval(() => updateAllHoursBoards(client), BOARD_INTERVAL);
+  // Run the hours board once shortly after startup so the embed is fresh
+  setTimeout(() => updateAllHoursBoards(client), 15_000);
   console.log('[Tracker] BattleMetrics player tracker started.');
 }
 
