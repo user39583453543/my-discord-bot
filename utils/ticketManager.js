@@ -15,7 +15,7 @@ const { getGuildData, saveGuildData } = require('./storage');
 const { generateTranscript } = require('./transcript');
 
 const DEFAULT_QUESTIONS = [
-  { label: 'How many hours do you have on Rust?', placeholder: 'e.g. 4000 hours', paragraph: false },
+  { label: 'How many hours do you have on Rust?', placeholder: 'e.g. 2500 hours', paragraph: false },
   { label: 'What is your Steam ID?', placeholder: 'Your 17-digit steamID64, e.g. 76561198000000000', paragraph: false },
   { label: 'What is your BattleMetrics profile link?', placeholder: 'https://www.battlemetrics.com/players/...', paragraph: false },
   { label: 'What can you do? (roles/skills)', placeholder: 'e.g. PVP, Builder, Farmer, Caller, Support…', paragraph: false },
@@ -310,8 +310,10 @@ async function holdTicket(interaction) {
     } catch {}
   }
 
-  const status = ticketInfo.onHold ? '⏸️ Ticket put on hold.' : '▶️ Ticket resumed.';
-  return interaction.reply({ content: status });
+  const status = ticketInfo.onHold
+    ? '⏸️ Your ticket has been placed on hold because wipe is about to begin. We will resume after wipe!'
+    : '▶️ Ticket resumed.';
+  return interaction.reply({ content: `<@${ticketInfo.userId}> ${status}` });
 }
 
 async function closeTicket(interaction) {
