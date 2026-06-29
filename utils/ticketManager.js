@@ -16,7 +16,7 @@ const { generateTranscript } = require('./transcript');
 
 const DEFAULT_QUESTIONS = [
   { label: 'How many hours do you have on Rust?', placeholder: 'e.g. 2500 hours', paragraph: false },
-  { label: 'What is your Steam ID?', placeholder: 'Your 17-digit steamID64, e.g. 76561198000000000', paragraph: false },
+  { label: 'What is your Steam ID? and what teams did you play in', placeholder: 'Your 17-digit steamID64, e.g. 76561198000000000', paragraph: false },
   { label: 'What is your BattleMetrics profile link?', placeholder: 'https://www.battlemetrics.com/players/...', paragraph: false },
   { label: 'What can you do? (roles/skills)', placeholder: 'e.g. PVP, Builder, Farmer, Caller, Support…', paragraph: false },
   { label: 'Hours/day you can play? (10+ mandatory) Can you buy VIP?', placeholder: 'e.g. 12 hours a day. Yes / No for VIP', paragraph: false },
