@@ -47,6 +47,11 @@ function defaultData() {
       logChannelId: null,
       members: [],
     },
+    rolesync: {
+      sourceRoleId: null,
+      targetGuildId: null,
+      targetRoleId: null,
+    },
   };
 }
 
@@ -71,6 +76,10 @@ function migrateData(data) {
   if (!data.vip) data.vip = { logChannelId: null, members: [] };
   if (data.vip.logChannelId === undefined) data.vip.logChannelId = null;
   if (!data.vip.members) data.vip.members = [];
+  if (!data.rolesync) data.rolesync = { sourceRoleId: null, targetGuildId: null, targetRoleId: null };
+  if (data.rolesync.sourceRoleId === undefined) data.rolesync.sourceRoleId = null;
+  if (data.rolesync.targetGuildId === undefined) data.rolesync.targetGuildId = null;
+  if (data.rolesync.targetRoleId === undefined) data.rolesync.targetRoleId = null;
   return data;
 }
 
