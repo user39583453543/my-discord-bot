@@ -20,12 +20,14 @@ const {
   refreshTicketPanels,
 } = require('./utils/ticketManager');
 const tracker = require('./utils/playerTracker');
+const roleSync = require('./utils/roleSync');
 
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildMembers,
   ],
 });
 
@@ -43,6 +45,18 @@ client.once('clientReady', () => {
   console.log(`[Bot] Logged in as ${client.user.tag}`);
   tracker.start(client);
   refreshTicketPanels(client).catch((err) => console.error('[Bot] Failed to refresh ticket panels:', err));
+});
+
+client.on('guildMemberUpdate', (oldMember, newMember) => {
+  roleSync.onGuildMemberUpdate(oldMember, newMember).catch((err) => console.error('[RoleSync]', err));
+});
+
+client.on('guildMemberRemove', (member) => {
+  roleSync.onGuildMemberRemove(member).catch((err) => console.error('[RoleSync]', err));
+});
+
+client.on('guildMemberAdd', (member) => {
+  roleSync.onGuildMemberAdd(member).catch((err) => console.error('[RoleSync]', err));
 });
 
 client.on('interactionCreate', async (interaction) => {
