@@ -26,6 +26,15 @@ function ticketNumber(n) {
   return String(n).padStart(4, '0');
 }
 
+function getQuestionsForCategory(cfg, category) {
+  if (category) {
+    const key = category.trim().toLowerCase();
+    const custom = cfg.categoryQuestions && cfg.categoryQuestions[key];
+    if (custom && custom.length) return custom;
+  }
+  return cfg.questions.length ? cfg.questions : DEFAULT_QUESTIONS;
+}
+
 function getPriority(answers) {
   const text = answers.map((a) => a.answer).join(' ').toLowerCase();
   if (/\bvouch(ed|es|ing)?\b/.test(text)) return 'high';
@@ -117,11 +126,11 @@ async function showTicketModal(interaction, category) {
     }
   }
 
-  const questions = cfg.questions.length ? cfg.questions : DEFAULT_QUESTIONS;
+  const questions = getQuestionsForCategory(cfg, category);
 
   const modal = new ModalBuilder()
     .setCustomId(category ? `ticket_modal:${category}` : 'ticket_modal')
-    .setTitle('Submit your ticket');
+    .setTitle((category ? `Apply — ${category}` : 'Submit your ticket').slice(0, 45));
 
   for (let i = 0; i < Math.min(questions.length, 5); i++) {
     const q = questions[i];
@@ -162,7 +171,7 @@ async function handleModalSubmit(interaction) {
 
   await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
-  const questions = cfg.questions.length ? cfg.questions : DEFAULT_QUESTIONS;
+  const questions = getQuestionsForCategory(cfg, category);
   const answers = questions.slice(0, 5).map((q, i) => ({
     question: q.label,
     answer: interaction.fields.getTextInputValue(`q${i}`) || '',
