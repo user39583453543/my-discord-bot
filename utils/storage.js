@@ -33,6 +33,7 @@ function defaultData() {
         questions: [],
         acceptRoleId: null,
         declinedRoleId: null,
+        categoryQuestions: {},
       },
       active: {},
     },
@@ -62,6 +63,7 @@ function migrateData(data) {
   if (!data.tickets.config.questions) data.tickets.config.questions = [];
   if (!data.tickets.config.acceptRoleId) data.tickets.config.acceptRoleId = null;
   if (!data.tickets.config.declinedRoleId) data.tickets.config.declinedRoleId = null;
+  if (!data.tickets.config.categoryQuestions) data.tickets.config.categoryQuestions = {};
   if (!data.tracker) data.tracker = { tracked: [] };
   if (data.tracker.playtimeServerId === undefined) {
     data.tracker.playtimeServerId = null;
