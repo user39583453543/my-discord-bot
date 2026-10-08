@@ -464,6 +464,14 @@ async function handleDeclineModal(interaction) {
   } catch {}
 
   if (ticketInfo) {
+    // Generate transcript before the channel is deleted
+    let transcriptFile;
+    try {
+      transcriptFile = await generateTranscript(channel, ticketInfo);
+    } catch (err) {
+      console.error('Transcript error (decline):', err);
+    }
+
     // Assign declined role if configured
     if (cfg.declinedRoleId) {
       try {
@@ -485,8 +493,12 @@ async function handleDeclineModal(interaction) {
             { name: 'Decline Reason', value: reason, inline: false },
           )
           .setTimestamp();
-        await logChannel.send({ embeds: [logEmbed] });
-      } catch {}
+        const sendOptions = { embeds: [logEmbed] };
+        if (transcriptFile) sendOptions.files = [transcriptFile];
+        await logChannel.send(sendOptions);
+      } catch (err) {
+        console.error('Failed to send decline log:', err);
+      }
     }
 
     // DM the opener
@@ -533,6 +545,14 @@ async function acceptTicket(interaction) {
 
   await interaction.reply({ content: '✅ Accepting and closing ticket…', flags: MessageFlags.Ephemeral });
 
+  // Generate transcript before the channel is deleted
+  let transcriptFile;
+  try {
+    transcriptFile = await generateTranscript(channel, ticketInfo);
+  } catch (err) {
+    console.error('Transcript error (accept):', err);
+  }
+
   // Assign accept role if configured
   if (cfg.acceptRoleId) {
     try {
@@ -553,8 +573,12 @@ async function acceptTicket(interaction) {
           { name: 'Accepted By', value: `<@${interaction.user.id}>`, inline: true },
         )
         .setTimestamp();
-      await logChannel.send({ embeds: [logEmbed] });
-    } catch {}
+      const sendOptions = { embeds: [logEmbed] };
+      if (transcriptFile) sendOptions.files = [transcriptFile];
+      await logChannel.send(sendOptions);
+    } catch (err) {
+      console.error('Failed to send accept log:', err);
+    }
   }
 
   // DM the opener
